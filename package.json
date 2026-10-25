@@ -1,0 +1,42 @@
+{
+  "name": "app-foodie-fiesta-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jpablopachar/app-foodie-fiesta-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jpablopachar/app-foodie-fiesta-server/issues"
+  },
+  "homepage": "https://github.com/jpablopachar/app-foodie-fiesta-server#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.11.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.11.4",
+    "multer": "^2.5.0",
+    "stripe": "^23.0.1",
+    "validator": "^13.15.35"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "^17.13.0",
+    "nodemon": "^3.1.14",
+    "prettier": "3.9.10"
+  }
+}
