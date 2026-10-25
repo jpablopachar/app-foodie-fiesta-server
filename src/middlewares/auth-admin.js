@@ -1,4 +1,5 @@
-import { verify } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
+import { env } from '../configs/env.js'
 
 /**
  * Verifica que la solicitud incluya un token válido para el administrador.
@@ -19,9 +20,9 @@ const authAdmin = async (req, res, next) => {
       })
     }
 
-    const tokenDecode = verify(token, process.env.JWT_SECRET)
+    const tokenDecode = jwt.verify(token, env.jwtSecret)
 
-    if (tokenDecode !== process.env.ADMIN_EMAIL + process.env.ADMIN_PASS) {
+    if (tokenDecode !== env.adminEmail + env.adminPass) {
       return res.json({
         success: false,
         message: 'Not Authorized please login',

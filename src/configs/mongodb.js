@@ -1,4 +1,5 @@
 import { connect } from "mongoose"
+import { env } from './env.js'
 
 /**
  * Conecta la aplicación con MongoDB mediante la URI almacenada en `MONGO_URI`.
@@ -8,7 +9,7 @@ import { connect } from "mongoose"
  */
 const connectDB = async ()=>{
     try {
-        await connect(process.env.MONGO_URI)
+        await connect(env.mongoUri)
 
         console.log("✔ Base de datos conectada")
     } catch (error) {

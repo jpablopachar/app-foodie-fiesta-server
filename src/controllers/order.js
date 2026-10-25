@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import { env } from '../configs/env.js'
 import orderModel from '../models/order.js'
 import userModel from '../models/user.js'
 
@@ -7,7 +8,7 @@ const currency = 'pkr'
 /** Cargo fijo de entrega aplicado a cada pedido, expresado en la moneda configurada. */
 const deliveryCharges = 10
 /** Cliente de Stripe configurado con la clave secreta del entorno. */
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+const stripe = new Stripe(env.stripeSecretKey)
 
 /**
  * Crea un pedido con pago contra entrega y vacía el carrito del usuario.

@@ -1,6 +1,7 @@
 import { compare, genSalt, hash } from 'bcrypt'
-import { sign } from 'jsonwebtoken'
-import { isEmail } from 'validator'
+import jwt from 'jsonwebtoken'
+import { env } from '../configs/env.js'
+import validator from 'validator'
 import userModel from '../models/user.js'
 
 /**
@@ -9,7 +10,7 @@ import userModel from '../models/user.js'
  * @returns Token JWT firmado.
  */
 const createToken = (id) => {
-  return sign({ id }, process.env.JWT_SECRET)
+  return jwt.sign({ id }, env.jwtSecret)
 }
 
 /**
@@ -27,7 +28,7 @@ const registerUser = async (req, res) => {
       return res.json({ success: false, message: 'El usuario ya existe' })
     }
 
-    if (!isEmail(email)) {
+    if (!validator.isEmail(email)) {
       return res.json({
         success: false,
         message: 'Por favor ingrese un correo electrónico válido',
@@ -102,10 +103,10 @@ const adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body
     if (
-      email === process.env.ADMIN_EMAIL &&
-      password === process.env.ADMIN_PASS
+      email === env.adminEmail &&
+      password === env.adminPass
     ) {
-      const token = sign(email + password, process.env.JWT_SECRET)
+      const token = jwt.sign(email + password, env.jwtSecret)
 
       res.json({ success: true, token })
     } else {

@@ -1,4 +1,5 @@
-import { verify } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
+import { env } from '../configs/env.js'
 
 /**
  * Comprueba la autenticación del usuario mediante el token recibido.
@@ -21,7 +22,7 @@ const authUser = async (req, res, next) => {
   }
 
   try {
-    const tokenDecode = verify(token, process.env.JWT_SECRET)
+    const tokenDecode = jwt.verify(token, env.jwtSecret)
 
     req.body.userId = tokenDecode.id
 

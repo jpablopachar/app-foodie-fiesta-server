@@ -1,4 +1,4 @@
-import { Schema, model, models } from "mongoose"
+import { Schema, model, models } from 'mongoose'
 
 /**
  * Esquema de Mongoose para los productos.
