@@ -1,4 +1,6 @@
-import { Schema, model, models } from 'mongoose'
+import mongoose from 'mongoose'
+
+const { Schema, model } = mongoose
 
 /**
  * Esquema de Mongoose para los productos.
@@ -18,6 +20,6 @@ const productSchema = new Schema({
 /**
  * Obtiene el modelo de producto existente o lo crea a partir de `productSchema`.
  */
-const product = models.product || model("product", productSchema);
+const productModel = mongoose.models.product || model("product", productSchema);
 
-export default product
+export default productModel

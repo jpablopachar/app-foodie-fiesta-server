@@ -1,4 +1,6 @@
-import { Schema, model, models } from 'mongoose'
+import mongoose from 'mongoose'
+
+const { Schema, model } = mongoose
 
 /**
  * Esquema de Mongoose para los usuarios.
@@ -18,6 +20,6 @@ const userSchema = new Schema(
 /**
  * Obtiene el modelo de usuario existente o lo crea a partir de `userSchema`.
  */
-const user = models.user || model("user", userSchema)
+const userModel = mongoose.models.user || model("user", userSchema)
 
-export default user
+export default userModel

@@ -1,4 +1,6 @@
-import { Schema, model, models } from 'mongoose'
+import mongoose from 'mongoose'
+
+const { Schema, model } = mongoose
 
 /**
  * Esquema de Mongoose para las órdenes.
@@ -18,6 +20,6 @@ const orderSchema = new Schema({
 /**
  * Obtiene el modelo de orden existente o lo crea a partir de `orderSchema`.
  */
-const order = models.order || model('order', orderSchema)
+const orderModel = mongoose.models.order || model('order', orderSchema)
 
-export default order
+export default orderModel
