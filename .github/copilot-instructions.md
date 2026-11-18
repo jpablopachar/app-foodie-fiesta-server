@@ -38,7 +38,7 @@ Order creation supports cash on delivery and Stripe checkout; Stripe uses `pkr`,
 - Mongoose models use the `models.<name> || model(...)` pattern to avoid recompilation errors.
 - Handlers respond with `{ success, message | data }` and catch errors with `console.log(error)`; most error paths still return HTTP 200 with `success: false` (product handlers use 500).
 - The codebase is ESM: relative imports need explicit `.js` extensions, and CommonJS packages must be default-imported (`import jwt from 'jsonwebtoken'`, then `jwt.sign`/`jwt.verify`; `import validator from 'validator'`, then `validator.isEmail`).
-- Import modules directly by file path. The barrel `index.js` files in `configs`, `models`, `controllers`, `middlewares` and `routes` are valid (explicit `.js` extensions) but unused.
+- Cross-folder imports use the barrel `index.js` of each folder (with explicit `.js`); siblings inside the same folder import each other directly. Add new files to their folder's barrel.
 - `src/configs/env.js` is the only module that reads `process.env`. It imports `dotenv/config` and exports a frozen `env` object; everything else imports `{ env }` from it (`env.port`, `env.mongoUri`, `env.jwtSecret`, `env.adminEmail`, `env.adminPass`, `env.cloudinaryName`, `env.cloudinaryApiKey`, `env.cloudinaryApiSecret`, `env.stripeSecretKey`). Add or rename variables only there.
 - The corresponding `.env` keys are `PORT`, `MONGO_URI`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASS`, `CLOUDINARY_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, and `STRIPE_SECRET_KEY`. There is no `.env.example`, and secret values must not be added to source control.
 - Existing comments and much of the domain language are in Spanish; preserve that language when editing adjacent code.

@@ -1,4 +1,4 @@
-import userModel from '../models/user.js'
+import { userModel } from '../models/index.js'
 
 /**
  * Agrega una unidad de un producto y talla al carrito del usuario.

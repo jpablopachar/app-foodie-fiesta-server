@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { env } from '../configs/env.js'
+import { env } from '../configs/index.js'
 
 /**
  * Verifica que la solicitud incluya un token válido para el administrador.

@@ -1,7 +1,6 @@
 import Stripe from 'stripe'
-import { env } from '../configs/env.js'
-import orderModel from '../models/order.js'
-import userModel from '../models/user.js'
+import { env } from '../configs/index.js'
+import { orderModel, userModel } from '../models/index.js'
 
 /** Moneda utilizada para los pagos procesados con Stripe. */
 const currency = 'pkr'

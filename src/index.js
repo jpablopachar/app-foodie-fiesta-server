@@ -1,12 +1,12 @@
 import cors from 'cors'
 import express from 'express'
-import { env } from './configs/env.js'
-import connectCloudinary from './configs/cloudinary.js'
-import connectDB from './configs/mongodb.js'
-import cartRouter from './routes/cart.js'
-import orderRouter from './routes/order.js'
-import productRouter from './routes/product.js'
-import userRouter from './routes/user.js'
+import { connectCloudinary, connectDB, env } from './configs/index.js'
+import {
+  cartRouter,
+  orderRouter,
+  productRouter,
+  userRouter,
+} from './routes/index.js'
 
 const app = express()
 

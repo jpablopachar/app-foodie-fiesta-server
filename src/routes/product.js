@@ -4,9 +4,8 @@ import {
   listProduct,
   removeProduct,
   singleProduct,
-} from '../controllers/product.js'
-import authAdmin from '../middlewares/auth-admin.js'
-import upload from '../middlewares/multer.js'
+} from '../controllers/index.js'
+import { authAdmin, upload } from '../middlewares/index.js'
 
 const productRouter = Router()
 

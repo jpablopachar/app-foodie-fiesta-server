@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { env } from '../configs/env.js'
+import { env } from '../configs/index.js'
 
 /**
  * Comprueba la autenticación del usuario mediante el token recibido.

@@ -6,9 +6,8 @@ import {
   updateStatus,
   userOrders,
   verifyStripe,
-} from '../controllers/order.js'
-import authAdmin from '../middlewares/auth-admin.js'
-import authUser from '../middlewares/auth.js'
+} from '../controllers/index.js'
+import { authAdmin, authUser } from '../middlewares/index.js'
 
 const orderRouter = Router()
 

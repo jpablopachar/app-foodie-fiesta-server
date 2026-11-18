@@ -3,7 +3,7 @@ import {
   adminLogin,
   loginUser,
   registerUser,
-} from '../controllers/user.js'
+} from '../controllers/index.js'
 
 const userRouter = Router()
 

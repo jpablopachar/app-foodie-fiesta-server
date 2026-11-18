@@ -1,8 +1,8 @@
 import { compare, genSalt, hash } from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { env } from '../configs/env.js'
+import { env } from '../configs/index.js'
 import validator from 'validator'
-import userModel from '../models/user.js'
+import { userModel } from '../models/index.js'
 
 /**
  * Crea un token JWT para identificar a un usuario.

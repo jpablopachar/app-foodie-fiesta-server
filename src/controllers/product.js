@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary'
-import productModel from '../models/product.js'
+import { productModel } from '../models/index.js'
 
 /**
  * Agrega un producto y guarda su imagen y precios.
