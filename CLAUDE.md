@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm start` — run with node
 - `npx eslint .` / `npx prettier --write .` — lint / format (flat config in `eslint.config.mjs`; Prettier: no semicolons, single quotes, 2 spaces, es5 trailing commas)
 - No test framework is configured (`npm test` is a placeholder).
+- Debugging: `.vscode/launch.json` has two configs — "Depurar servidor (node)" (runs `src/index.js` directly, F5) and "Depurar servidor (nodemon)" (runs `npm run dev` with auto-restart).
 
 ## Architecture
 
@@ -15,7 +16,7 @@ Express 5 + Mongoose 9 REST backend (ESM, `"type": "module"`) for the Foodie Fie
 
 Layout under `src/`: `configs/` (env, MongoDB, Cloudinary), `models/` (order, product, user), `controllers/` (cart, order, product, user), `middlewares/` (auth, auth-admin, multer), `routes/` (one router per resource).
 
-`src/index.js` creates the Express app (`express.json`, `cors`), mounts the routers at `/api/user`, `/api/product`, `/api/cart`, `/api/order`, then connects MongoDB and Cloudinary and listens on `env.port` (default 4000).
+`src/index.js` creates the Express app (`express.json`, `cors`), mounts the routers at `/api/user`, `/api/product`, `/api/cart`, `/api/order`, exposes `GET /` (health check, replies "API funcionando"), then (in `startServer()`) connects MongoDB and Cloudinary and listens on `env.port` (default 4000).
 
 ### Environment variables
 
@@ -33,5 +34,6 @@ Layout under `src/`: `configs/` (env, MongoDB, Cloudinary), `models/` (order, pr
 ## Current state / pitfalls
 
 - Routes: user (`/register`, `/login`, `/admin`), product (`/add` + `/remove` admin, `/single`, `/list` public), order (`/list`, `/status` admin; `/place`, `/stripe`, `/verifyStripe`, `/userOrders` user), cart (`/add`, `/update`, `/get`, all user). All are POST except product `/list` (GET).
-- Node ESM needs explicit `.js` extensions and CommonJS packages must use default imports (`import jwt from 'jsonwebtoken'`, `import validator from 'validator'`, `mongoose.models`). Source files import each other directly with `.js`; **the barrel files are still broken and unused**: `models/index.js`, `controllers/index.js`, `middlewares/index.js` (points at `./admin-auth`, file is `auth-admin.js`) and `routes/index.js` lack `.js` extensions, and the controller barrel re-exports `default` while controllers use named exports. Import files directly, or fix the barrels first.
+- Node ESM needs explicit `.js` extensions and CommonJS packages must use default imports (`import jwt from 'jsonwebtoken'`, `import validator from 'validator'`, `mongoose.models`). Source files import each other directly with `.js`; the barrel files (`configs`, `models`, `controllers`, `middlewares`, `routes` → `index.js`) are all valid but unused; the app imports files directly. Barrels re-export with explicit `.js`: models/routes as `xModel`/`xRouter`, controllers via `export *` (named exports), middlewares as `authAdmin`, `authUser`, `upload`.
+- `.github/copilot-instructions.md` holds a parallel copy of these guidelines; keep it in sync when this file changes.
 - `controllers/order.js` instantiates `Stripe` at import time; this works because importing `configs/env.js` loads `dotenv` first.

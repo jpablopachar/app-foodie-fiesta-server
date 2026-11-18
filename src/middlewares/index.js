@@ -1,3 +1,3 @@
-export { default as authAdmin } from './admin-auth'
-export { default as authUser } from './auth'
-export * from './multer'
+export { default as authAdmin } from './auth-admin.js'
+export { default as authUser } from './auth.js'
+export { default as upload } from './multer.js'
