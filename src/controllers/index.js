@@ -1,4 +1,4 @@
-export * from './cart.js'
-export * from './order.js'
-export * from './product.js'
-export * from './user.js'
+export { cartController } from './cart.js'
+export { orderController } from './order.js'
+export { productController } from './product.js'
+export { userController } from './user.js'

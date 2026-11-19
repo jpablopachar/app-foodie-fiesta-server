@@ -15,7 +15,7 @@ There is no build script or configured test framework. `npm test` is a placehold
 
 ## Architecture
 
-The backend uses Express 5 and Mongoose 9 with native ES modules (`"type": "module"`). The code is organized by responsibility under `src/`: `configs/` holds environment loading (`env.js`), MongoDB, and Cloudinary setup; `models/` defines user/product/order schemas; `controllers/` implements cart, product, user, and order operations; `middlewares/` handles user/admin authentication and uploads; and `routes/` defines one Express router per resource.
+The backend uses Express 5 and Mongoose 9 with native ES modules (`"type": "module"`). Requests follow `routes/` → `controllers/` (HTTP) → `services/` (business rules and integrations) → `repositories/` (Mongoose operations) → `models/` (user/product/order schemas). The cart service uses the user repository because cart data is stored on the user. Under `src/`, `configs/` holds environment loading, MongoDB, and Cloudinary setup, and `middlewares/` handles authentication and uploads.
 
 `src/index.js` creates the app (`express.json()`, `cors()`), mounts the routers at `/api/user`, `/api/product`, `/api/cart`, and `/api/order`, exposes a `GET /` health response, then awaits `connectDB()` and `connectCloudinary()` before listening on `env.port` (default 4000).
 
@@ -28,17 +28,18 @@ Route access is enforced per route in `src/routes/*.js`:
 
 All endpoints are `POST` except `GET /api/product/list`.
 
-Order creation supports cash on delivery and Stripe checkout; Stripe uses `pkr`, adds a fixed delivery charge, and its client is created when `controllers/order.js` is imported. This works because that module imports `configs/env.js`, which loads `dotenv` first.
+Order creation supports cash on delivery and Stripe checkout; Stripe uses `pkr`, adds a fixed delivery charge, and its client is created when `services/order.js` is imported. This works because that module imports `configs/env.js`, which loads `dotenv` first.
 
 ## Repository conventions and integration details
 
 - Use the existing Prettier settings: no semicolons, single quotes, two-space indentation, and ES5 trailing commas. ESLint uses the flat config in `eslint.config.mjs`.
 - User JWTs are read from the `token` request header. `authUser` verifies the token and places the decoded ID in `req.body.userId`, which the user controllers consume. Admin authentication uses `ADMIN_EMAIL` and `ADMIN_PASS` from the environment rather than a database admin record.
-- Product image uploads use Multer disk storage and Cloudinary. The order controller calculates Stripe line items from product size prices and applies the existing delivery charge and currency conversion.
+- Product image uploads use Multer disk storage and Cloudinary. The order service calculates Stripe line items from product size prices and applies the existing delivery charge and currency conversion.
 - Mongoose models use the `models.<name> || model(...)` pattern to avoid recompilation errors.
 - Handlers respond with `{ success, message | data }` and catch errors with `console.log(error)`; most error paths still return HTTP 200 with `success: false` (product handlers use 500).
 - The codebase is ESM: relative imports need explicit `.js` extensions, and CommonJS packages must be default-imported (`import jwt from 'jsonwebtoken'`, then `jwt.sign`/`jwt.verify`; `import validator from 'validator'`, then `validator.isEmail`).
 - Cross-folder imports use the barrel `index.js` of each folder (with explicit `.js`); siblings inside the same folder import each other directly. Add new files to their folder's barrel.
+- Controllers, services, and repositories export named objects (`xController`, `xService`, `xRepository`). Routers register controller methods directly, without binding `this`.
 - `src/configs/env.js` is the only module that reads `process.env`. It imports `dotenv/config` and exports a frozen `env` object; everything else imports `{ env }` from it (`env.port`, `env.mongoUri`, `env.jwtSecret`, `env.adminEmail`, `env.adminPass`, `env.cloudinaryName`, `env.cloudinaryApiKey`, `env.cloudinaryApiSecret`, `env.stripeSecretKey`). Add or rename variables only there.
 - The corresponding `.env` keys are `PORT`, `MONGO_URI`, `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASS`, `CLOUDINARY_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, and `STRIPE_SECRET_KEY`. There is no `.env.example`, and secret values must not be added to source control.
 - Existing comments and much of the domain language are in Spanish; preserve that language when editing adjacent code.

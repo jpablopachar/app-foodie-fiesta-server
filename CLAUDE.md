@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Express 5 + Mongoose 9 REST backend (ESM, `"type": "module"`) for the Foodie Fiesta food-ordering app (MERN). Code and comments are in Spanish; API response messages are mixed Spanish/English.
 
-Layout under `src/`: `configs/` (env, MongoDB, Cloudinary), `models/` (order, product, user), `controllers/` (cart, order, product, user), `middlewares/` (auth, auth-admin, multer), `routes/` (one router per resource).
+Layout under `src/`: `configs/` (env, MongoDB, Cloudinary), `middlewares/` (auth, auth-admin, multer), and `routes/` (one router per resource). Requests follow `routes/` → `controllers/` (HTTP) → `services/` (business rules and integrations) → `repositories/` (Mongoose operations) → `models/` (order, product, user). The cart service uses the user repository because cart data is stored on the user.
 
 `src/index.js` creates the Express app (`express.json`, `cors`), mounts the routers at `/api/user`, `/api/product`, `/api/cart`, `/api/order`, exposes `GET /` (health check, replies "API funcionando"), then (in `startServer()`) connects MongoDB and Cloudinary and listens on `env.port` (default 4000).
 
@@ -24,7 +24,7 @@ Layout under `src/`: `configs/` (env, MongoDB, Cloudinary), `models/` (order, pr
 
 ### Conventions that span files
 
-- **Response style**: handlers always reply HTTP 200 with `{ success: boolean, message | data }`, including on errors; they use try/catch and `console.log(error)`.
+- **Response style**: handlers reply with `{ success: boolean, ... }`; errors generally return HTTP 200, except product errors, which return HTTP 500. Controllers handle exceptions with try/catch and `console.log(error)`.
 - **User auth**: JWT is sent in a `token` request header (not `Authorization: Bearer`). `authUser` verifies it and injects `req.body.userId`, which controllers then read from the body.
 - **Admin auth**: there is no admin user record. `adminLogin` signs the string `ADMIN_EMAIL + ADMIN_PASS` as the JWT payload, and `authAdmin` checks the decoded payload equals that string.
 - **File uploads**: Multer uses disk storage (original filename); product images are then uploaded to Cloudinary.
@@ -34,6 +34,6 @@ Layout under `src/`: `configs/` (env, MongoDB, Cloudinary), `models/` (order, pr
 ## Current state / pitfalls
 
 - Routes: user (`/register`, `/login`, `/admin`), product (`/add` + `/remove` admin, `/single`, `/list` public), order (`/list`, `/status` admin; `/place`, `/stripe`, `/verifyStripe`, `/userOrders` user), cart (`/add`, `/update`, `/get`, all user). All are POST except product `/list` (GET).
-- Node ESM needs explicit `.js` extensions and CommonJS packages must use default imports (`import jwt from 'jsonwebtoken'`, `import validator from 'validator'`, `mongoose.models`). Cross-folder imports go through the barrel `index.js` of each folder (`../configs/index.js`, `../models/index.js`, `../controllers/index.js`, `../middlewares/index.js`, `../routes/index.js`), always with explicit `.js`. Barrels export: models `xModel`, routers `xRouter`, controllers via `export *` (named), middlewares `authAdmin`/`authUser`/`upload`, configs `connectDB`/`connectCloudinary`/`env`. Inside a folder, import siblings directly (not through the barrel) to avoid cycles; when adding a file, add it to its barrel.
+- Node ESM needs explicit `.js` extensions and CommonJS packages must use default imports (`import jwt from 'jsonwebtoken'`, `import validator from 'validator'`, `mongoose.models`). Cross-folder imports go through the barrel `index.js` of each folder, always with explicit `.js`. Barrels export: models `xModel`, routers `xRouter`, controllers `xController`, services `xService`, repositories `xRepository`, middlewares `authAdmin`/`authUser`/`upload`, configs `connectDB`/`connectCloudinary`/`env`. Inside a folder, import siblings directly (not through the barrel) to avoid cycles; when adding a file, add it to its barrel.
 - `.github/copilot-instructions.md` holds a parallel copy of these guidelines; keep it in sync when this file changes.
-- `controllers/order.js` instantiates `Stripe` at import time; this works because importing `configs/env.js` loads `dotenv` first.
+- `services/order.js` instantiates `Stripe` at import time; this works because importing `configs/env.js` loads `dotenv` first.
