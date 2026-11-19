@@ -7,6 +7,7 @@ import {
   userRouter,
 } from './routes/index.js'
 
+/** Aplicación de Express configurada con middleware y rutas de la API. */
 const app = express()
 
 app.use(express.json())
