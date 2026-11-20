@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: controllers/order.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: controllers/order.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { orderService } from '../services/index.js'
+
+/**
+ * Controladores HTTP para crear, consultar y actualizar órdenes.
+ */
+export const orderController = {
+  /**
+   * Crea una orden con pago contra entrega.
+   * @param req Solicitud con los datos de la orden en el cuerpo.
+   * @param res Respuesta HTTP.
+   * @returns Envía el resultado de la creación.
+   */
+  async placeOrder(req, res) {
+    try {
+      await orderService.place(req.body)
+      res.json({ success: true, message: 'Orden colocada' })
+    } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+    }
+  },
+
+  /**
+   * Crea una orden y genera una sesión de pago de Stripe.
+   * @param req Solicitud con los datos de la orden en el cuerpo.
+   * @param res Respuesta HTTP.
+   * @returns Envía la URL de pago o el error.
+   */
+  async placeOrderStripe(req, res) {
+    try {
+      const sessionUrl = await orderService.placeStripe(
+        req.body,
+        req.headers.origin
+      )
+      res.json({
+        success: true,
+        session_url: sessionUrl,
+        message: 'Orden colocada',
+      })
+    } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+    }
+  },
+
+  /**
+   * Verifica el resultado de un pago de Stripe.
+   * @param req Solicitud con el resultado del pago en el cuerpo.
+   * @param res Respuesta HTTP.
+   * @returns Envía si el pago se confirmó.
+   */
+  async verifyStripe(req, res) {
+    try {
+      const success = await orderService.verifyStripe(req.body)
+      res.json({ success })
+    } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+    }
+  },
+
+  /**
+   * Obtiene todas las órdenes registradas.
+   * @param req Solicitud HTTP.
+   * @param res Respuesta HTTP.
+   * @returns Envía la lista de órdenes o el error.
+   */
+  async allOrders(req, res) {
+    try {
+      const orders = await orderService.list()
+      res.json({ success: true, orders })
+    } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+    }
+  },
+
+  /**
+   * Obtiene las órdenes asociadas al usuario indicado.
+   * @param req Solicitud con `userId` en el cuerpo.
+   * @param res Respuesta HTTP.
+   * @returns Envía las órdenes del usuario o el error.
+   */
+  async userOrders(req, res) {
+    try {
+      const orders = await orderService.listByUser(req.body.userId)
+      res.json({ success: true, orders })
+    } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+    }
+  },
+
+  /**
+   * Actualiza el estado de una orden.
+   * @param req Solicitud con `orderId` y `status` en el cuerpo.
+   * @param res Respuesta HTTP.
+   * @returns Envía el resultado de la actualización.
+   */
+  async updateStatus(req, res) {
+    try {
+      const { orderId, status } = req.body
+      await orderService.updateStatus(orderId, status)
+      res.json({ success: true, message: 'Estado actualizado' })
+    } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+    }
+  },
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#app">app</a></li><li><a href="global.html#authAdmin">authAdmin</a></li><li><a href="global.html#authUser">authUser</a></li><li><a href="global.html#cartController">cartController</a></li><li><a href="global.html#cartService">cartService</a></li><li><a href="global.html#connectCloudinary">connectCloudinary</a></li><li><a href="global.html#connectDB">connectDB</a></li><li><a href="global.html#createOrder">createOrder</a></li><li><a href="global.html#createToken">createToken</a></li><li><a href="global.html#currency">currency</a></li><li><a href="global.html#deliveryCharges">deliveryCharges</a></li><li><a href="global.html#env">env</a></li><li><a href="global.html#orderController">orderController</a></li><li><a href="global.html#orderModel">orderModel</a></li><li><a href="global.html#orderRepository">orderRepository</a></li><li><a href="global.html#orderSchema">orderSchema</a></li><li><a href="global.html#orderService">orderService</a></li><li><a href="global.html#productController">productController</a></li><li><a href="global.html#productModel">productModel</a></li><li><a href="global.html#productRepository">productRepository</a></li><li><a href="global.html#productSchema">productSchema</a></li><li><a href="global.html#productService">productService</a></li><li><a href="global.html#startServer">startServer</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#stripe">stripe</a></li><li><a href="global.html#upload">upload</a></li><li><a href="global.html#userController">userController</a></li><li><a href="global.html#userModel">userModel</a></li><li><a href="global.html#userRepository">userRepository</a></li><li><a href="global.html#userSchema">userSchema</a></li><li><a href="global.html#userService">userService</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Nov 20 2026 16:38:49 GMT-0500 (hora de Ecuador)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

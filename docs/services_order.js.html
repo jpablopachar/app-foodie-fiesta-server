@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/order.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/order.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Stripe from 'stripe'
+import { env } from '../configs/index.js'
+import { orderRepository, userRepository } from '../repositories/index.js'
+
+/** Código de moneda que se utiliza al crear sesiones de pago en Stripe. */
+const currency = 'pkr'
+
+/** Importe fijo añadido a cada compra por concepto de entrega. */
+const deliveryCharges = 10
+
+/** Cliente de Stripe configurado con la clave secreta de la aplicación. */
+const stripe = new Stripe(env.stripeSecretKey)
+
+/**
+ * Crea una orden y registra su método de pago y fecha de creación.
+ * @param data - Datos principales de la orden.
+ * @param data.userId - Identificador del usuario.
+ * @param data.items - Productos incluidos en la orden.
+ * @param data.amount - Importe total de la orden.
+ * @param data.address - Dirección de entrega.
+ * @param paymentMethod - Método de pago utilizado.
+ * @returns La orden creada.
+ */
+const createOrder = ({ userId, items, amount, address }, paymentMethod) =>
+  orderRepository.create({
+    userId,
+    items,
+    amount,
+    address,
+    paymentMethod,
+    payment: false,
+    date: Date.now(),
+  })
+
+/**
+ * Operaciones de negocio para la creación y gestión de órdenes.
+ */
+export const orderService = {
+  /**
+   * Crea una orden con pago contra entrega y vacía el carrito del usuario.
+   * @param data - Datos de la orden.
+   */
+  async place(data) {
+    await createOrder(data, 'COD')
+    await userRepository.saveCart(data.userId, {})
+  },
+
+  /**
+   * Crea una orden y una sesión de pago de Stripe.
+   * @param data - Datos de la orden y sus productos.
+   * @param origin - URL base utilizada para las rutas de éxito y cancelación.
+   * @returns URL de la sesión de pago de Stripe.
+   */
+  async placeStripe(data, origin) {
+    const order = await createOrder(data, 'Stripe')
+
+    const lineItems = data.items.map((item) => ({
+      price_data: {
+        currency,
+        product_data: {
+          name: item.name,
+        },
+        unit_amount: item.price[item.size] * 100 * 277,
+      },
+      quantity: item.quantity,
+    }))
+
+    lineItems.push({
+      price_data: {
+        currency,
+        product_data: {
+          name: 'Delivery_Charges',
+        },
+        unit_amount: deliveryCharges * 100 * 277,
+      },
+      quantity: 1,
+    })
+
+    const session = await stripe.checkout.sessions.create({
+      success_url: `${origin}/verify?success=true&amp;orderId=${order._id}`,
+      cancel_url: `${origin}/verify?success=false&amp;orderId=${order._id}`,
+      line_items: lineItems,
+      mode: 'payment',
+    })
+
+    return session.url
+  },
+
+  /**
+   * Confirma el pago de Stripe o elimina la orden si el pago no se completó.
+   * Si el pago se confirma, también vacía el carrito del usuario.
+   * @param data - Resultado de la verificación y datos de la orden.
+   * @param data.orderId - Identificador de la orden.
+   * @param data.success - Indicador de éxito recibido desde Stripe.
+   * @param data.userId - Identificador del usuario.
+   * @returns `true` si el pago se confirmó; de lo contrario, `false`.
+   */
+  async verifyStripe({ orderId, success, userId }) {
+    if (success === 'true') {
+      await orderRepository.markPaid(orderId)
+      await userRepository.saveCart(userId, {})
+      return true
+    }
+
+    await orderRepository.remove(orderId)
+    return false
+  },
+
+  /**
+   * Obtiene todas las órdenes.
+   * @returns Lista de órdenes.
+   */
+  list() {
+    return orderRepository.findAll()
+  },
+
+  /**
+   * Obtiene las órdenes de un usuario.
+   * @param userId - Identificador del usuario.
+   * @returns Órdenes del usuario.
+   */
+  listByUser(userId) {
+    return orderRepository.findByUser(userId)
+  },
+
+  /**
+   * Actualiza el estado de una orden.
+   * @param orderId - Identificador de la orden.
+   * @param status - Nuevo estado de la orden.
+   * @returns La orden encontrada antes de actualizarla, o `null` si no existe.
+   */
+  updateStatus(orderId, status) {
+    return orderRepository.updateStatus(orderId, status)
+  },
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#app">app</a></li><li><a href="global.html#authAdmin">authAdmin</a></li><li><a href="global.html#authUser">authUser</a></li><li><a href="global.html#cartController">cartController</a></li><li><a href="global.html#cartService">cartService</a></li><li><a href="global.html#connectCloudinary">connectCloudinary</a></li><li><a href="global.html#connectDB">connectDB</a></li><li><a href="global.html#createOrder">createOrder</a></li><li><a href="global.html#createToken">createToken</a></li><li><a href="global.html#currency">currency</a></li><li><a href="global.html#deliveryCharges">deliveryCharges</a></li><li><a href="global.html#env">env</a></li><li><a href="global.html#orderController">orderController</a></li><li><a href="global.html#orderModel">orderModel</a></li><li><a href="global.html#orderRepository">orderRepository</a></li><li><a href="global.html#orderSchema">orderSchema</a></li><li><a href="global.html#orderService">orderService</a></li><li><a href="global.html#productController">productController</a></li><li><a href="global.html#productModel">productModel</a></li><li><a href="global.html#productRepository">productRepository</a></li><li><a href="global.html#productSchema">productSchema</a></li><li><a href="global.html#productService">productService</a></li><li><a href="global.html#startServer">startServer</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#stripe">stripe</a></li><li><a href="global.html#upload">upload</a></li><li><a href="global.html#userController">userController</a></li><li><a href="global.html#userModel">userModel</a></li><li><a href="global.html#userRepository">userRepository</a></li><li><a href="global.html#userSchema">userSchema</a></li><li><a href="global.html#userService">userService</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Nov 20 2026 16:38:49 GMT-0500 (hora de Ecuador)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

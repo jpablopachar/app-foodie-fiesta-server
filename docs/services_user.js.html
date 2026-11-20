@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: services/user.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: services/user.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { compare, genSalt, hash } from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import validator from 'validator'
+import { env } from '../configs/index.js'
+import { userRepository } from '../repositories/index.js'
+
+/**
+ * Genera un token de autenticación para el identificador de usuario indicado.
+ * @param id Identificador del usuario.
+ * @returns Token firmado con el secreto de la aplicación.
+ */
+const createToken = (id) => jwt.sign({ id }, env.jwtSecret)
+
+/**
+ * Operaciones de negocio para registrar y autenticar usuarios y administradores.
+ */
+export const userService = {
+  /**
+   * Valida los datos, registra un usuario y genera su token de autenticación.
+   * @param data Datos del usuario.
+   * @param data.name Nombre del usuario.
+   * @param data.email Correo electrónico del usuario.
+   * @param data.password Contraseña sin cifrar.
+   * @returns Token del usuario o mensaje de validación/error.
+   */
+  async register({ name, email, password }) {
+    const exists = await userRepository.findByEmail(email)
+
+    if (exists) {
+      return { message: 'El usuario ya existe' }
+    }
+
+    if (!validator.isEmail(email)) {
+      return { message: 'Por favor ingrese un correo electrónico válido' }
+    }
+
+    if (password.length &lt; 8) {
+      return { message: 'Por favor ingrese una contraseña segura' }
+    }
+
+    const salt = await genSalt(10)
+    const hashedPassword = await hash(password, salt)
+    const user = await userRepository.create({
+      name,
+      email,
+      password: hashedPassword,
+    })
+
+    return { token: createToken(user._id) }
+  },
+
+  /**
+   * Comprueba las credenciales de un usuario y genera su token de autenticación.
+   * @param credentials Credenciales de acceso.
+   * @param credentials.email Correo electrónico del usuario.
+   * @param credentials.password Contraseña sin cifrar.
+   * @returns Token del usuario o mensaje de error.
+   */
+  async login({ email, password }) {
+    const user = await userRepository.findByEmail(email)
+
+    if (!user) {
+      return { message: 'El usuario no existe' }
+    }
+
+    if (!(await compare(password, user.password))) {
+      return { message: 'Credenciales inválidas' }
+    }
+
+    return { token: createToken(user._id) }
+  },
+
+  /**
+   * Comprueba las credenciales administrativas configuradas y genera un token.
+   * @param credentials Credenciales administrativas.
+   * @param credentials.email Correo electrónico del administrador.
+   * @param credentials.password Contraseña del administrador.
+   * @returns Token administrativo o mensaje de error.
+   */
+  adminLogin({ email, password }) {
+    if (email !== env.adminEmail || password !== env.adminPass) {
+      return { message: 'Credenciales inválidas' }
+    }
+
+    return { token: jwt.sign(email + password, env.jwtSecret) }
+  },
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#app">app</a></li><li><a href="global.html#authAdmin">authAdmin</a></li><li><a href="global.html#authUser">authUser</a></li><li><a href="global.html#cartController">cartController</a></li><li><a href="global.html#cartService">cartService</a></li><li><a href="global.html#connectCloudinary">connectCloudinary</a></li><li><a href="global.html#connectDB">connectDB</a></li><li><a href="global.html#createOrder">createOrder</a></li><li><a href="global.html#createToken">createToken</a></li><li><a href="global.html#currency">currency</a></li><li><a href="global.html#deliveryCharges">deliveryCharges</a></li><li><a href="global.html#env">env</a></li><li><a href="global.html#orderController">orderController</a></li><li><a href="global.html#orderModel">orderModel</a></li><li><a href="global.html#orderRepository">orderRepository</a></li><li><a href="global.html#orderSchema">orderSchema</a></li><li><a href="global.html#orderService">orderService</a></li><li><a href="global.html#productController">productController</a></li><li><a href="global.html#productModel">productModel</a></li><li><a href="global.html#productRepository">productRepository</a></li><li><a href="global.html#productSchema">productSchema</a></li><li><a href="global.html#productService">productService</a></li><li><a href="global.html#startServer">startServer</a></li><li><a href="global.html#storage">storage</a></li><li><a href="global.html#stripe">stripe</a></li><li><a href="global.html#upload">upload</a></li><li><a href="global.html#userController">userController</a></li><li><a href="global.html#userModel">userModel</a></li><li><a href="global.html#userRepository">userRepository</a></li><li><a href="global.html#userSchema">userSchema</a></li><li><a href="global.html#userService">userService</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Nov 20 2026 16:38:49 GMT-0500 (hora de Ecuador)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
