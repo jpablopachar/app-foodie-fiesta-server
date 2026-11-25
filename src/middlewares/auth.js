@@ -24,6 +24,7 @@ const authUser = async (req, res, next) => {
   try {
     const tokenDecode = jwt.verify(token, env.jwtSecret)
 
+    req.body ??= {}
     req.body.userId = tokenDecode.id
 
     next()
