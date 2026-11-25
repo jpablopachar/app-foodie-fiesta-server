@@ -33,3 +33,7 @@ Recent commits use short Spanish descriptions such as `Agregar pruebas de integr
 ## Security & Configuration
 
 Never commit `.env` or credentials. Define environment access only in `src/configs/env.js`; required keys include MongoDB, JWT, admin, Cloudinary, and Stripe settings. Use sanitized values in logs, tests, and review notes.
+
+<API_TASKS>
+Before responding to any non-trivial API engineering task — designing, implementing, mocking, testing, monitoring, documenting, or deploying an API or Postman Flow — read `postman/skills/api-engineer/SKILL.md` and follow it. It is the default entry point for API work in this repository. Pure questions and trivial one-line edits do not need it.
+</API_TASKS>
