@@ -1,16 +1,601 @@
 {
   "info": {
+    "_postman_id": "41d7ca2c-8810-4bd1-9642-341bf70cdf4c",
     "name": "Foodie Fiesta API",
-    "description": "Colección basada en src/configs/swagger.js. Configure baseUrl y las credenciales de ejemplo en Usuarios. Ejecute el registro o el inicio de sesión de usuario antes de usar Carrito y las órdenes de usuario; ejecute el inicio de sesión de administrador antes de modificar productos o administrar órdenes. Los scripts compartidos guardan automáticamente los JWT en userToken y adminToken a nivel de colección y los reutilizan en el encabezado token que exige la API (no Bearer). Cada nuevo intento de autenticación elimina el token anterior del mismo rol; las respuestas fallidas no guardan tokens. Las peticiones protegidas sin token se omiten con un error explícito: vuelva a iniciar sesión si el token es inválido o expiró; no hay renovación automática. No exporte ni comparta la colección con tokens guardados. Sustituya los identificadores y datos de ejemplo antes de enviar las solicitudes. Las solicitudes de creación, actualización, eliminación y pago modifican datos.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "description": "Colección basada en src/configs/swagger.js. Configure baseUrl y las credenciales de ejemplo en Usuarios. Ejecute el registro o el inicio de sesión de usuario antes de usar Carrito y las órdenes de usuario; ejecute el inicio de sesión de administrador antes de modificar productos o administrar órdenes. Los scripts compartidos guardan automáticamente los JWT en userToken y admin-token a nivel de colección y los reutilizan en el encabezado token que exige la API (no Bearer). Cada nuevo intento de autenticación elimina el token anterior del mismo rol; las respuestas fallidas no guardan tokens. Las peticiones protegidas sin token se omiten con un error explícito: vuelva a iniciar sesión si el token es inválido o expiró; no hay renovación automática. No exporte ni comparta la colección con tokens guardados. Sustituya los identificadores y datos de ejemplo antes de enviar las solicitudes. Las solicitudes de creación, actualización, eliminación y pago modifican datos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3084185"
   },
-  "variable": [
-    { "key": "baseUrl", "value": "http://localhost:4000" },
-    { "key": "userToken", "value": "" },
-    { "key": "adminToken", "value": "" },
-    { "key": "productId", "value": "665f1a2b3c4d5e6f7a8b9c0d" },
-    { "key": "orderId", "value": "665f1a2b3c4d5e6f7a8b9c0d" },
-    { "key": "frontendUrl", "value": "http://localhost:5173" }
+  "item": [
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Registra un usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuario de ejemplo\",\n  \"email\": \"usuario@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/user/register",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Inicia sesión como usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"admin-token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"daniel@yopmail.com\",\n  \"password\": \"bdpachar1@\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/user/login",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Inicia sesión como administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set(\"admin-token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jppachar@yopmail.com\",\n  \"password\": \"jppachar1@\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/user/admin",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "admin"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Crea un producto y carga una imagen opcional",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{admin-token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Pizza",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Pizza de ejemplo",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "Pizza",
+                  "type": "text"
+                },
+                {
+                  "key": "prices",
+                  "value": "[{\"size\":\"small\",\"price\":10},{\"size\":\"large\",\"price\":20}]",
+                  "type": "text"
+                },
+                {
+                  "key": "popular",
+                  "value": "false",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "description": "Opcional: habilite este campo y seleccione un archivo.",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/product/add",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "product",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Elimina un producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{admin-token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{productId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/product/remove",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "product",
+                "remove"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtiene un producto por ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/product/single",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "product",
+                "single"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lista los productos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/api/product/list",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "product",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Carrito",
+      "item": [
+        {
+          "name": "Agrega una unidad de producto al carrito",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemId\": \"{{productId}}\",\n  \"size\": \"small\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/cart/add",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "add"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Establece la cantidad de un producto en el carrito",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemId\": \"{{productId}}\",\n  \"size\": \"small\",\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/cart/update",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtiene el carrito del usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{apiUrl}}/api/cart/get",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "get"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Órdenes",
+      "item": [
+        {
+          "name": "Crea una orden con pago contra entrega",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"name\": \"Pizza\",\n      \"price\": { \"small\": 10 },\n      \"size\": \"small\",\n      \"quantity\": 1\n    }\n  ],\n  \"amount\": 20,\n  \"address\": {\n    \"firstName\": \"Ana\",\n    \"lastName\": \"Pérez\",\n    \"street\": \"Calle 1\",\n    \"city\": \"Quito\",\n    \"phone\": \"0990000000\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/order/place",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "place"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crea una orden e inicia el pago con Stripe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Origin",
+                "value": "{{frontendUrl}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"name\": \"Pizza\",\n      \"price\": { \"small\": 10 },\n      \"size\": \"small\",\n      \"quantity\": 1\n    }\n  ],\n  \"amount\": 20,\n  \"address\": {\n    \"firstName\": \"Ana\",\n    \"lastName\": \"Pérez\",\n    \"street\": \"Calle 1\",\n    \"city\": \"Quito\",\n    \"phone\": \"0990000000\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/order/stripe",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "stripe"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirma o cancela una orden tras el pago",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{userToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"success\": \"true\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/order/verifyStripe",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "verifyStripe"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lista las órdenes del usuario autenticado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{apiUrl}}/api/order/userOrders",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "userOrders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lista todas las órdenes (administrador)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{admin-token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{apiUrl}}/api/order/list",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualiza el estado de una orden (administrador)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "{{admin-token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"status\": \"Preparando\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/api/order/status",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "api",
+                "order",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
   ],
   "event": [
     {
@@ -22,14 +607,14 @@
           "const loginTokens = {",
           "  '/api/user/register': 'userToken',",
           "  '/api/user/login': 'userToken',",
-          "  '/api/user/admin': 'adminToken'",
+          "  '/api/user/admin': 'admin-token'",
           "};",
           "if (loginTokens[path]) {",
           "  pm.collectionVariables.unset(loginTokens[path]);",
           "}",
           "const tokenHeader = pm.request.headers.get('token');",
           "const tokenKey = tokenHeader === '{{userToken}}' ? 'userToken'",
-          "  : tokenHeader === '{{adminToken}}' ? 'adminToken' : null;",
+          "  : tokenHeader === '{{admin-token}}' ? 'admin-token' : null;",
           "if (tokenKey) {",
           "  const token = pm.collectionVariables.get(tokenKey);",
           "  if (typeof token !== 'string' || !token.trim()) {",
@@ -51,7 +636,7 @@
           "const loginTokens = {",
           "  '/api/user/register': 'userToken',",
           "  '/api/user/login': 'userToken',",
-          "  '/api/user/admin': 'adminToken'",
+          "  '/api/user/admin': 'admin-token'",
           "};",
           "const tokenKey = loginTokens[pm.request.url.getPath()];",
           "if (tokenKey) {",
@@ -69,238 +654,18 @@
       }
     }
   ],
-  "item": [
+  "variable": [
     {
-      "name": "Usuarios",
-      "item": [
-        {
-          "name": "Registra un usuario",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Usuario de ejemplo\",\n  \"email\": \"usuario@example.com\",\n  \"password\": \"password123\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/user/register"
-          }
-        },
-        {
-          "name": "Inicia sesión como usuario",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"usuario@example.com\",\n  \"password\": \"password123\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/user/login"
-          }
-        },
-        {
-          "name": "Inicia sesión como administrador",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/user/admin"
-          }
-        }
-      ]
+      "key": "productId",
+      "value": "665f1a2b3c4d5e6f7a8b9c0d"
     },
     {
-      "name": "Productos",
-      "item": [
-        {
-          "name": "Crea un producto y carga una imagen opcional",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "token", "value": "{{adminToken}}" }],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                { "key": "name", "value": "Pizza", "type": "text" },
-                { "key": "description", "value": "Pizza de ejemplo", "type": "text" },
-                { "key": "category", "value": "Pizza", "type": "text" },
-                { "key": "prices", "value": "[{\"size\":\"small\",\"price\":10},{\"size\":\"large\",\"price\":20}]", "type": "text" },
-                { "key": "popular", "value": "false", "type": "text" },
-                { "key": "image", "type": "file", "src": "", "disabled": true, "description": "Opcional: habilite este campo y seleccione un archivo." }
-              ]
-            },
-            "url": "{{baseUrl}}/api/product/add"
-          }
-        },
-        {
-          "name": "Elimina un producto",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "token", "value": "{{adminToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id\": \"{{productId}}\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/product/remove"
-          }
-        },
-        {
-          "name": "Obtiene un producto por ID",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"productId\": \"{{productId}}\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/product/single"
-          }
-        },
-        {
-          "name": "Lista los productos",
-          "request": { "method": "GET", "url": "{{baseUrl}}/api/product/list" }
-        }
-      ]
+      "key": "orderId",
+      "value": "665f1a2b3c4d5e6f7a8b9c0d"
     },
     {
-      "name": "Carrito",
-      "item": [
-        {
-          "name": "Agrega una unidad de producto al carrito",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "token", "value": "{{userToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"itemId\": \"{{productId}}\",\n  \"size\": \"small\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/cart/add"
-          }
-        },
-        {
-          "name": "Establece la cantidad de un producto en el carrito",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "token", "value": "{{userToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"itemId\": \"{{productId}}\",\n  \"size\": \"small\",\n  \"quantity\": 1\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/cart/update"
-          }
-        },
-        {
-          "name": "Obtiene el carrito del usuario",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "token", "value": "{{userToken}}" }],
-            "url": "{{baseUrl}}/api/cart/get"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Órdenes",
-      "item": [
-        {
-          "name": "Crea una orden con pago contra entrega",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "token", "value": "{{userToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"name\": \"Pizza\",\n      \"price\": { \"small\": 10 },\n      \"size\": \"small\",\n      \"quantity\": 1\n    }\n  ],\n  \"amount\": 20,\n  \"address\": {\n    \"firstName\": \"Ana\",\n    \"lastName\": \"Pérez\",\n    \"street\": \"Calle 1\",\n    \"city\": \"Quito\",\n    \"phone\": \"0990000000\"\n  }\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/order/place"
-          }
-        },
-        {
-          "name": "Crea una orden e inicia el pago con Stripe",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "token", "value": "{{userToken}}" },
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Origin", "value": "{{frontendUrl}}" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"name\": \"Pizza\",\n      \"price\": { \"small\": 10 },\n      \"size\": \"small\",\n      \"quantity\": 1\n    }\n  ],\n  \"amount\": 20,\n  \"address\": {\n    \"firstName\": \"Ana\",\n    \"lastName\": \"Pérez\",\n    \"street\": \"Calle 1\",\n    \"city\": \"Quito\",\n    \"phone\": \"0990000000\"\n  }\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/order/stripe"
-          }
-        },
-        {
-          "name": "Confirma o cancela una orden tras el pago",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "token", "value": "{{userToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"success\": \"true\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/order/verifyStripe"
-          }
-        },
-        {
-          "name": "Lista las órdenes del usuario autenticado",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "token", "value": "{{userToken}}" }],
-            "url": "{{baseUrl}}/api/order/userOrders"
-          }
-        },
-        {
-          "name": "Lista todas las órdenes (administrador)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "token", "value": "{{adminToken}}" }],
-            "url": "{{baseUrl}}/api/order/list"
-          }
-        },
-        {
-          "name": "Actualiza el estado de una orden (administrador)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "token", "value": "{{adminToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"status\": \"Preparando\"\n}",
-              "options": { "raw": { "language": "json" } }
-            },
-            "url": "{{baseUrl}}/api/order/status"
-          }
-        }
-      ]
+      "key": "frontendUrl",
+      "value": "http://localhost:5173"
     }
   ]
 }
